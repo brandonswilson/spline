@@ -20,7 +20,7 @@ import java.io.{File, FileWriter, IOException}
 import java.util.Properties
 
 import org.apache.atlas.ApplicationProperties
-import org.apache.commons.configuration.Configuration
+import org.apache.commons.configuration.{Configuration, PropertiesConfiguration}
 import za.co.absa.spline.common.ARMImplicits
 import za.co.absa.spline.persistence.api._
 
@@ -60,11 +60,19 @@ class AtlasPersistenceFactory(configuration: Configuration) extends PersistenceF
     atlasConfTempFile.deleteOnExit()
     atlasConfTempDir.deleteOnExit()
 
+    /* Read the system properties for Atlas before overwriting the location for the temp conf */
+    val atlasSystemProps = new PropertiesConfiguration(atlasTemporaryConfigurationFileName)
+
     System.setProperty(atlasConfigurationDirKey, atlasConfTempDir.getAbsolutePath)
 
     val atlasProps = new Properties() {
       (configuration getKeys atlasPropertyPrefix).asScala.foreach(key =>
         setProperty(key, configuration getString key))
+    }
+
+    /* copy the system level properties for Atlas to the temp config */
+    for (key <- atlasSystemProps.getKeys().asScala) {
+      atlasProps.setProperty(key,atlasSystemProps.getString(key))
     }
 
     import ARMImplicits._
