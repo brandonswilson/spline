@@ -1,0 +1,5 @@
+To leverage the Atlas persistence model you must do three things:
+   1. enable atlas persistence factor in `spline.properties`
+   2. ensure the atlas-application.properties file is in the classpath of the Spark job that is executed
+   3. POST a one-time request to the Atlas server to create the entities in `src/main/atlas/spline-meta-model.json`. The target REST
+      endpoint in the Atlas v2 API is: ``/api/atlas/v2/types/typedefs/headers`
